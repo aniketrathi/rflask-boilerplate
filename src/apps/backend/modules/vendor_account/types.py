@@ -1,16 +1,13 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from modules.account.types import Account
-
 
 class VendorType(Enum):
     AMAZON = "AMAZON"
 
-
 @dataclass(frozen=True)
 class VendorAccount:
-    account: str | Account
+    account_id: str
     id: str
     name: str
     vendor_type: VendorType

@@ -13,14 +13,14 @@ class VendorAccountWriter:
     @staticmethod
     def create_vendor_account(params: CreateVendorAccountParams) -> VendorAccount:
         vendor_account = VendorAccountReader.get_vendor_account_optional(
-            account_id=params.account_id, vendor_account_name=params.name
+            account_id=params.account_id, vendor_account_name=params.name, vendor_type=params.vendor_type
         )
 
         if vendor_account:
             raise VendorAccountWithSameNameAndAccountExistsError(vendor_account_name=params.name)
 
         vendor_account_data = {
-            "account": ObjectId(params.account_id),
+            "account_id": ObjectId(params.account_id),
             "active": True,
             "created_at": datetime.now(timezone.utc),
             "name": params.name,

@@ -1,15 +1,22 @@
 from bson import ObjectId
 
 from modules.vendor_account.internal.store.vendor_account_repository import VendorAccountRepository
-from modules.vendor_account.types import VendorAccount
+from modules.vendor_account.types import VendorAccount, VendorType
 from modules.vendor_account.internal.vendor_account_util import VendorAccountUtil
 
 
 class VendorAccountReader:
     @staticmethod
-    def get_vendor_account_optional(account_id: str, vendor_account_name: str) -> VendorAccount:
+    def get_vendor_account_optional(
+        account_id: str, vendor_account_name: str, vendor_type: VendorType
+    ) -> VendorAccount:
         vendor_account_db = VendorAccountRepository.collection().find_one(
-            {"account": ObjectId(account_id), "name": vendor_account_name, "active": True}
+            {
+                "account_id": ObjectId(account_id),
+                "active": True,
+                "name": vendor_account_name,
+                "vendor_type": vendor_type,
+            }
         )
 
         if vendor_account_db:

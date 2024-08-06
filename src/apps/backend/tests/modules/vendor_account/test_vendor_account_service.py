@@ -21,7 +21,7 @@ class TestVendorAccountService(BaseTestVendorAccount):
             params=CreateVendorAccountParams(account_id=self.account_id, name="Amz-01", vendor_type="AMAZON")
         )
 
-        assert vendor_account.account == self.account_id
+        assert vendor_account.account_id == self.account_id
         assert vendor_account.name == "Amz-01"
         assert vendor_account.vendor_type == "AMAZON"
 

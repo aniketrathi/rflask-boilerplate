@@ -37,11 +37,11 @@ class TestVendorAccountApi(BaseTestVendorAccount):
             )
             assert response.status_code == 201
             assert response.json, f"No response from API with status code:: {response.status}"
-            assert response.json.get("account") == self.account_id
+            assert response.json.get("account_id") == self.account_id
             assert response.json.get("name") == "Amz-01"
             assert response.json.get("vendor_type") == "AMAZON"
 
-    def test_create_vendor_account_with_same_account_and_name(self) -> None:
+    def test_create_vendor_account_with_same_account_name_and_vendor_type(self) -> None:
         # Pre test setup
         params = CreateVendorAccountParams(account_id=self.account_id, name="Amz-01", vendor_type="AMAZON")
 
@@ -58,3 +58,22 @@ class TestVendorAccountApi(BaseTestVendorAccount):
         assert response.json
         assert response.json.get("code") == VendorAccountErrorCode.NAME_ALREADY_EXISTS
         assert response.json.get("message") == f"A vendor account with the name {params.name} has already been created. Please choose a different name."
+
+    def test_create_vendor_account_with_same_account_and_name_but_for_different_vendor(self) -> None:
+        # Pre test setup
+        params = CreateVendorAccountParams(account_id=self.account_id, name="Vendor-01", vendor_type="AMAZON")
+
+        VendorAccountService.create_vendor_account(params)
+        # Pre test setup end
+
+        with app.test_client() as client:
+            response = client.post(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+                data=json.dumps({"name": params.name, "vendor_type": "Croma"}),
+            )
+            assert response.status_code == 201
+            assert response.json, f"No response from API with status code:: {response.status}"
+            assert response.json.get("account_id") == self.account_id
+            assert response.json.get("name") == params.name
+            assert response.json.get("vendor_type") == "Croma"
