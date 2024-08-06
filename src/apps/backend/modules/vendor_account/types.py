@@ -10,17 +10,10 @@ class VendorType(Enum):
 
 @dataclass(frozen=True)
 class VendorAccount:
-    id: str
     account: str | Account
+    id: str
     name: str
     vendor_type: VendorType
-
-
-@dataclass(frozen=True)
-class NameAlreadyExistParams:
-    account_id: str
-    name: str
-
 
 @dataclass(frozen=True)
 class CreateVendorAccountParams:

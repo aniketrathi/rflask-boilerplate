@@ -1,3 +1,4 @@
+from pymongo import ASCENDING
 from modules.application.repository import ApplicationRepository
 
 
@@ -6,4 +7,4 @@ class VendorAccountRepository(ApplicationRepository):
 
     @classmethod
     def on_init_collection(cls, collection):
-        collection.create_index("account")
+        collection.create_index([("account", ASCENDING), ("active", ASCENDING), ("name", ASCENDING)])
