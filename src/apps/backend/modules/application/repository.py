@@ -1,3 +1,5 @@
+import certifi
+
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.server_api import ServerApi
@@ -27,7 +29,7 @@ class ApplicationRepositoryClient:
   def _create_client() -> MongoClient:
     connection_uri = ConfigService.get_string('MONGODB_URI')
     Logger.info(message=f"connecting to database - {connection_uri}")
-    client = MongoClient(connection_uri, server_api=ServerApi('1'))
+    client = MongoClient(connection_uri, server_api=ServerApi('1'), tlsCAFile=certifi.where())
     Logger.info(message=f"connected to database - {connection_uri}")
 
     return client

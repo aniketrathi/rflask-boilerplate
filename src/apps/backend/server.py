@@ -7,6 +7,7 @@ from modules.password_reset_token.rest_api.password_reset_token_rest_api_server 
 from modules.account.rest_api.account_rest_api_server import AccountRestApiServer
 from modules.logger.logger_manager import LoggerManager
 from modules.error.custom_errors import AppError
+from modules.vendor_account.rest_api.vendor_account_rest_api_server import VendorAccountRestApiServer
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -26,6 +27,11 @@ api_blueprint.register_blueprint(password_reset_token_blueprint)
 # Register accounts apis
 account_blueprint = AccountRestApiServer.create()
 api_blueprint.register_blueprint(account_blueprint)
+
+#Register vendor acount apis
+vendor_account_blueprint = VendorAccountRestApiServer.create()
+api_blueprint.register_blueprint(vendor_account_blueprint)
+
 app.register_blueprint(api_blueprint)
 
 # Register frontend elements
