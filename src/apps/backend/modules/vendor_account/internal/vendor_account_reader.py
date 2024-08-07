@@ -1,5 +1,6 @@
 from bson import ObjectId
 
+from modules.vendor_account.errors import VendorAccountNotFoundError
 from modules.vendor_account.internal.store.vendor_account_repository import VendorAccountRepository
 from modules.vendor_account.types import VendorAccount, VendorType
 from modules.vendor_account.internal.vendor_account_util import VendorAccountUtil
@@ -21,3 +22,14 @@ class VendorAccountReader:
 
         if vendor_account_db:
             return VendorAccountUtil.convert_vendor_account_db_to_vendor_account(vendor_account_db=vendor_account_db)
+
+    @staticmethod
+    def get_vendor_account_by_id(account_id: str, vendor_account_id: str) -> VendorAccount:
+        vendor_account_db = VendorAccountRepository.collection().find_one(
+            {"account_id": ObjectId(account_id), "active": True, "_id": ObjectId(vendor_account_id)}
+        )
+
+        if vendor_account_db is None:
+            raise VendorAccountNotFoundError(vendor_account_id=vendor_account_id)
+
+        return VendorAccountUtil.convert_vendor_account_db_to_vendor_account(vendor_account_db=vendor_account_db)

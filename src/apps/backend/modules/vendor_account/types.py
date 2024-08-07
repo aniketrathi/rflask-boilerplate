@@ -18,7 +18,13 @@ class CreateVendorAccountParams:
     name: str
     vendor_type: VendorType
 
+@dataclass(frozen=True)
+class UpdateVendorAccountParams:
+    account_id: str
+    name: str
+    vendor_account_id: str
 
 @dataclass(frozen=True)
 class VendorAccountErrorCode:
     NAME_ALREADY_EXISTS: str = "VENDOR_ACCOUNT_ERR_01"
+    VENDOR_ACCOUNT_NOT_FOUND: str = "VENDOR_ACCOUNT_ERR_02"
