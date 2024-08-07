@@ -1,4 +1,5 @@
 from pymongo import ASCENDING
+
 from modules.application.repository import ApplicationRepository
 
 
