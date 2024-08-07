@@ -3,6 +3,13 @@ run-lint:
 	&& pipenv install --dev \
 	&& pipenv run mypy --config-file mypy.ini .
 
+run-format:
+	cd src/apps/backend \
+	&& pipenv install --dev \
+	&& pipenv run autoflake . -i \
+	&& pipenv run isort . \
+	&& pipenv run black .
+
 run-vulture:
 	cd src/apps/backend \
 	&& pipenv install --dev \
@@ -25,3 +32,8 @@ run-engine-winx86:
 	cd src/apps/backend \
 	&& pipenv install --dev && pipenv install \
 	&& pipenv run waitress-serve --listen 127.0.0.1:8080 server:app
+
+run-script:
+	cd src/apps/backend && \
+	pipenv install --dev && \
+	pipenv run python scripts/$(file).py
