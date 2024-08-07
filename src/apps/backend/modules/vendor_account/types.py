@@ -5,6 +5,7 @@ from enum import Enum
 class VendorType(Enum):
     AMAZON = "AMAZON"
 
+
 @dataclass(frozen=True)
 class VendorAccount:
     account_id: str
@@ -12,17 +13,26 @@ class VendorAccount:
     name: str
     vendor_type: VendorType
 
+
 @dataclass(frozen=True)
 class CreateVendorAccountParams:
     account_id: str
     name: str
     vendor_type: VendorType
 
+
 @dataclass(frozen=True)
 class UpdateVendorAccountParams:
     account_id: str
     name: str
     vendor_account_id: str
+
+
+@dataclass(frozen=True)
+class DeleteVendorAccountParams:
+    account_id: str
+    vendor_account_id: str
+
 
 @dataclass(frozen=True)
 class VendorAccountErrorCode:
