@@ -8,9 +8,9 @@ from modules.access_token.rest_api.access_token_rest_api_server import AccessTok
 from modules.account.rest_api.account_rest_api_server import AccountRestApiServer
 from modules.config.config_manager import ConfigManager
 from modules.error.custom_errors import AppError
-from modules.vendor_account.rest_api.vendor_account_rest_api_server import VendorAccountRestApiServer
 from modules.logger.logger_manager import LoggerManager
 from modules.password_reset_token.rest_api.password_reset_token_rest_api_server import PasswordResetTokenRestApiServer
+from modules.vendor_account.rest_api.vendor_account_rest_api_server import VendorAccountRestApiServer
 
 load_dotenv()
 
@@ -33,7 +33,7 @@ api_blueprint.register_blueprint(password_reset_token_blueprint)
 account_blueprint = AccountRestApiServer.create()
 api_blueprint.register_blueprint(account_blueprint)
 
-#Register vendor acount apis
+# Register vendor acount apis
 vendor_account_blueprint = VendorAccountRestApiServer.create()
 api_blueprint.register_blueprint(vendor_account_blueprint)
 

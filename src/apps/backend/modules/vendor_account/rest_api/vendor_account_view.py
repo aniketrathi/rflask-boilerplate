@@ -4,9 +4,9 @@ from flask import jsonify, request
 from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
-from modules.vendor_account.vendor_account_service import VendorAccountService
-from modules.vendor_account.types import CreateVendorAccountParams, DeleteVendorAccountParams, UpdateVendorAccountParams
 from modules.access_token.rest_api.access_auth_middleware import access_auth_middleware
+from modules.vendor_account.types import CreateVendorAccountParams, DeleteVendorAccountParams, UpdateVendorAccountParams
+from modules.vendor_account.vendor_account_service import VendorAccountService
 
 
 class VendorAccountView(MethodView):

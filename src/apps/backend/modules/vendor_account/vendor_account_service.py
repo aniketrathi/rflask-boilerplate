@@ -1,13 +1,13 @@
 from typing import List
 
 from modules.vendor_account.internal.vendor_account_reader import VendorAccountReader
+from modules.vendor_account.internal.vendor_account_writer import VendorAccountWriter
 from modules.vendor_account.types import (
     CreateVendorAccountParams,
     DeleteVendorAccountParams,
     UpdateVendorAccountParams,
     VendorAccount,
 )
-from modules.vendor_account.internal.vendor_account_writer import VendorAccountWriter
 
 
 class VendorAccountService:

@@ -1,11 +1,11 @@
 import unittest
 from typing import Callable
 
-from modules.vendor_account.internal.store.vendor_account_repository import VendorAccountRepository
-from modules.vendor_account.rest_api.vendor_account_rest_api_server import VendorAccountRestApiServer
+from modules.account.internal.store.account_repository import AccountRepository
 from modules.config.config_manager import ConfigManager
 from modules.logger.logger_manager import LoggerManager
-from modules.account.internal.store.account_repository import AccountRepository
+from modules.vendor_account.internal.store.vendor_account_repository import VendorAccountRepository
+from modules.vendor_account.rest_api.vendor_account_rest_api_server import VendorAccountRestApiServer
 
 
 class BaseTestVendorAccount(unittest.TestCase):

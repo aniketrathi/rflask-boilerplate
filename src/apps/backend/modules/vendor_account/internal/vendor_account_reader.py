@@ -1,11 +1,12 @@
 from typing import List
+
 from bson import ObjectId
 from pymongo import ASCENDING
 
 from modules.vendor_account.errors import VendorAccountNotFoundError
 from modules.vendor_account.internal.store.vendor_account_repository import VendorAccountRepository
-from modules.vendor_account.types import VendorAccount, VendorType
 from modules.vendor_account.internal.vendor_account_util import VendorAccountUtil
+from modules.vendor_account.types import VendorAccount, VendorType
 
 
 class VendorAccountReader:
