@@ -57,7 +57,7 @@ class VendorAccountWriter:
         return VendorAccountUtil.convert_vendor_account_db_to_vendor_account(vendor_account_db=updated_vendor_account)
 
     @staticmethod
-    def delete_vendor_account(params: DeleteVendorAccountParams) -> VendorAccount:
+    def delete_vendor_account(params: DeleteVendorAccountParams) -> None:
         VendorAccountReader.get_vendor_account_by_id(
             account_id=params.account_id, vendor_account_id=params.vendor_account_id
         )
