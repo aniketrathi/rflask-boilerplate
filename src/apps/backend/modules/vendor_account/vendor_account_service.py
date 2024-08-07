@@ -1,4 +1,5 @@
 from typing import List
+
 from modules.vendor_account.internal.vendor_account_reader import VendorAccountReader
 from modules.vendor_account.types import (
     CreateVendorAccountParams,
