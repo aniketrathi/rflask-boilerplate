@@ -1,5 +1,7 @@
 import json
+from bson import ObjectId
 
+from modules.vendor_account.internal.store.vendor_account_repository import VendorAccountRepository
 from modules.account.types import CreateAccountParams
 from modules.access_token.access_token_service import AccessTokenService
 from modules.access_token.types import CreateAccessTokenParams
@@ -138,4 +140,38 @@ class TestVendorAccountApi(BaseTestVendorAccount):
         assert (
             response.json.get("message")
             == f"A vendor account with the name {params_one.name} has already been created. Please choose a different name."
+        )
+
+    def test_delete_vendor_account(self) -> None:
+        # Pre test setup
+        params = CreateVendorAccountParams(account_id=self.account_id, name="Amz-01", vendor_type="AMAZON")
+
+        vendor_account = VendorAccountService.create_vendor_account(params)
+        # Pre test setup end
+
+        vendor_account_before = VendorAccountRepository.collection().find_one({"_id": ObjectId(vendor_account.id)})
+        assert vendor_account_before['active'] == True
+
+        with app.test_client() as client:
+            response = client.delete(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts/{vendor_account.id}",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+            )
+            assert response.status_code == 204
+
+        vendor_account_after = VendorAccountRepository.collection().find_one({"_id": ObjectId(vendor_account.id)})
+        assert vendor_account_after['active'] == False
+
+    def test_delete_vendor_account_with_an_invalid_vendor_account_id(self) -> None:
+        with app.test_client() as client:
+            response = client.delete(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts/66b2400af6d99e62d6e7992c",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+            )
+        assert response.status_code == 404
+        assert response.json
+        assert response.json.get("code") == VendorAccountErrorCode.VENDOR_ACCOUNT_NOT_FOUND
+        assert (
+            response.json.get("message")
+            == "Vendor account with id 66b2400af6d99e62d6e7992c not found. Please verify the id and try again."
         )

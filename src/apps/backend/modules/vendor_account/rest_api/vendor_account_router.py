@@ -15,4 +15,10 @@ class VendorAccountRouter:
             view_func=VendorAccountView.as_view("vendor_account_update"),
             methods=["PUT"],
         )
+
+        blueprint.add_url_rule(
+            "/accounts/<account_id>/vendor-accounts/<vendor_account_id>",
+            view_func=VendorAccountView.as_view("vendor_account_delete"),
+            methods=["DELETE"],
+        )
         return blueprint
