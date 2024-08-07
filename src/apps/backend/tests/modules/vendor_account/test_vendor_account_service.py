@@ -99,3 +99,24 @@ class TestVendorAccountService(BaseTestVendorAccount):
             )
         except VendorAccountNotFoundError as exc:
             assert exc.code == VendorAccountErrorCode.VENDOR_ACCOUNT_NOT_FOUND
+
+    def test_get_all_vendor_accounts(self) -> None:
+        # Pre test setup
+        params_one = CreateVendorAccountParams(account_id=self.account_id, name="Amz-01", vendor_type="AMAZON")
+
+        VendorAccountService.create_vendor_account(params_one)
+
+        params_two = CreateVendorAccountParams(account_id=self.account_id, name="Amz-02", vendor_type="AMAZON")
+
+        VendorAccountService.create_vendor_account(params_two)
+        # Pre test setup end
+
+        vendor_accounts = VendorAccountService.get_vendor_accounts(account_id=self.account_id)
+
+        assert len(vendor_accounts) == 2
+        assert vendor_accounts[0].account_id == self.account_id
+        assert vendor_accounts[0].name == "Amz-01"
+        assert vendor_accounts[0].vendor_type == "AMAZON"
+        assert vendor_accounts[1].account_id == self.account_id
+        assert vendor_accounts[1].name == "Amz-02"
+        assert vendor_accounts[1].vendor_type == "AMAZON"
