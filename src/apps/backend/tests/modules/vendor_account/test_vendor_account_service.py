@@ -81,14 +81,14 @@ class TestVendorAccountService(BaseTestVendorAccount):
         # Pre test setup end
 
         vendor_account_before = VendorAccountRepository.collection().find_one({"_id": ObjectId(vendor_account.id)})
-        assert vendor_account_before['active'] == True
+        assert vendor_account_before["active"] == True
 
         VendorAccountService.delete_vendor_account(
             params=DeleteVendorAccountParams(account_id=self.account_id, vendor_account_id=vendor_account.id)
         )
 
         vendor_account_after = VendorAccountRepository.collection().find_one({"_id": ObjectId(vendor_account.id)})
-        assert vendor_account_after['active'] == False
+        assert vendor_account_after["active"] == False
 
     def test_throw_exception_when_vendor_account_does_not_exist_while_deleting_vendor_account(self) -> None:
         try:

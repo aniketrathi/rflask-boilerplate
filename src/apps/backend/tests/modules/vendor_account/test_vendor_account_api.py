@@ -150,7 +150,7 @@ class TestVendorAccountApi(BaseTestVendorAccount):
         # Pre test setup end
 
         vendor_account_before = VendorAccountRepository.collection().find_one({"_id": ObjectId(vendor_account.id)})
-        assert vendor_account_before['active'] == True
+        assert vendor_account_before["active"] == True
 
         with app.test_client() as client:
             response = client.delete(
@@ -160,7 +160,7 @@ class TestVendorAccountApi(BaseTestVendorAccount):
             assert response.status_code == 204
 
         vendor_account_after = VendorAccountRepository.collection().find_one({"_id": ObjectId(vendor_account.id)})
-        assert vendor_account_after['active'] == False
+        assert vendor_account_after["active"] == False
 
     def test_delete_vendor_account_with_an_invalid_vendor_account_id(self) -> None:
         with app.test_client() as client:
