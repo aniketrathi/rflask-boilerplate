@@ -1,4 +1,9 @@
-from modules.vendor_account.types import CreateVendorAccountParams, DeleteVendorAccountParams, UpdateVendorAccountParams, VendorAccount
+from modules.vendor_account.types import (
+    CreateVendorAccountParams,
+    DeleteVendorAccountParams,
+    UpdateVendorAccountParams,
+    VendorAccount,
+)
 from modules.vendor_account.internal.vendor_account_writer import VendorAccountWriter
 
 
