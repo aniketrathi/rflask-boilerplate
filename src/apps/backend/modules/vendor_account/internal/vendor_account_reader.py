@@ -1,5 +1,6 @@
 from typing import List
 from bson import ObjectId
+from pymongo import ASCENDING
 
 from modules.vendor_account.errors import VendorAccountNotFoundError
 from modules.vendor_account.internal.store.vendor_account_repository import VendorAccountRepository
@@ -37,8 +38,10 @@ class VendorAccountReader:
 
     @staticmethod
     def get_vendor_accounts_by_account_id(account_id: str) -> List[VendorAccount]:
-        vendor_accounts_db = VendorAccountRepository.collection().find(
-            {"account_id": ObjectId(account_id), "active": True}
+        vendor_accounts_db = (
+            VendorAccountRepository.collection()
+            .find({"account_id": ObjectId(account_id), "active": True})
+            .sort([("name", ASCENDING), ("created_at", ASCENDING)])
         )
 
         return list(map(VendorAccountUtil.convert_vendor_account_db_to_vendor_account, vendor_accounts_db))
