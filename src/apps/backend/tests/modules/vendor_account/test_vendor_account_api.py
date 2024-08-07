@@ -175,3 +175,30 @@ class TestVendorAccountApi(BaseTestVendorAccount):
             response.json.get("message")
             == "Vendor account with id 66b2400af6d99e62d6e7992c not found. Please verify the id and try again."
         )
+
+    def test_get_all_vendor_accounts(self) -> None:
+        # Pre test setup
+        params_one = CreateVendorAccountParams(account_id=self.account_id, name="Amz-01", vendor_type="AMAZON")
+
+        VendorAccountService.create_vendor_account(params_one)
+
+        params_two = CreateVendorAccountParams(account_id=self.account_id, name="Amz-02", vendor_type="AMAZON")
+
+        VendorAccountService.create_vendor_account(params_two)
+        # Pre test setup end
+
+        with app.test_client() as client:
+            response = client.get(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+            )
+
+            assert response.status_code == 200
+            assert response.json, f"No response from API with status code:: {response.status}"
+            assert len(response.json) == 2
+            assert response.json[0]["account_id"] == self.account_id
+            assert response.json[0]["name"] == "Amz-01"
+            assert response.json[0]["vendor_type"] == "AMAZON"
+            assert response.json[1]["account_id"] == self.account_id
+            assert response.json[1]["name"] == "Amz-02"
+            assert response.json[1]["vendor_type"] == "AMAZON"

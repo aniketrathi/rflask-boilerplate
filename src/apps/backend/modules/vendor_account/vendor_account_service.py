@@ -1,3 +1,5 @@
+from typing import List
+from modules.vendor_account.internal.vendor_account_reader import VendorAccountReader
 from modules.vendor_account.types import (
     CreateVendorAccountParams,
     DeleteVendorAccountParams,
@@ -19,3 +21,7 @@ class VendorAccountService:
     @staticmethod
     def delete_vendor_account(params: DeleteVendorAccountParams) -> None:
         return VendorAccountWriter.delete_vendor_account(params=params)
+
+    @staticmethod
+    def get_vendor_accounts(account_id: str) -> List[VendorAccount]:
+        return VendorAccountReader.get_vendor_accounts_by_account_id(account_id=account_id)
