@@ -58,7 +58,5 @@ class TestExtractPurchaseOrderHistoryRequestApi(BaseTestExtractPurchaseOrderHist
                 data=payload,
             )
 
-        expected_command = (
-            f"npm run run:amazon-purchase-order-history-extraction test@test.com amz-01#test {response.json["id"]}"
-        )
+        expected_command = f"npm run run:amazon-purchase-order-history-extraction --username=test@test.com --password=amz-01#test --request_id={response.json["id"]}"
         mock_popen.assert_called_once_with(expected_command, shell=True)

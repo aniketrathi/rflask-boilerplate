@@ -53,5 +53,5 @@ class TestExtractPurchaseOrderHistoryRequestService(BaseTestExtractPurchaseOrder
             params=extract_purchase_order_history_params
         )
 
-        expected_command = f"npm run run:amazon-purchase-order-history-extraction {extract_purchase_order_history_params.vendor_account_username} {extract_purchase_order_history_params.vendor_account_password} {extract_purchase_order_history_request.id}"
+        expected_command = f"npm run run:amazon-purchase-order-history-extraction --username={extract_purchase_order_history_params.vendor_account_username} --password={extract_purchase_order_history_params.vendor_account_password} --request_id={extract_purchase_order_history_request.id}"
         mock_popen.assert_called_once_with(expected_command, shell=True)
