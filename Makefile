@@ -31,9 +31,9 @@ run-engine-winx86:
 	sincas gunicorn is not well supported by windows os"
 	cd src/apps/backend \
 	&& pipenv install --dev && pipenv install \
-	&& pipenv run waitress-serve --listen 127.0.0.1:8080 server:app
+	PYTHONPATH=./ pipenv run python scripts/$(file).py
 
-run-script:
+run-amazon-purchase-order-history-extraction:
 	cd src/apps/backend && \
 	pipenv install --dev && \
-	pipenv run python scripts/$(file).py
+	PYTHONPATH=./ pipenv run python modules/extract_purchase_order_history_request/workers/amazon_purchase_order_history_extraction_worker.py $(username) $(password) $(request_id)

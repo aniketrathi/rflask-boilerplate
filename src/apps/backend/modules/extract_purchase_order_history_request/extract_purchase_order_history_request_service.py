@@ -19,7 +19,7 @@ class PurchaseOrderHistorySerivce:
         )
 
         # Run the worker with username, password, and request ID in the background
-        command = f"npm run run:amazon-purchase-order-history-extraction {params.vendor_account_username} {params.vendor_account_password} {extract_purchase_order_history_request.id}"
+        command = f"npm run run:amazon-purchase-order-history-extraction --username={params.vendor_account_username} --password={params.vendor_account_password} --request_id={extract_purchase_order_history_request.id}"
         subprocess.Popen(command, shell=True)
 
         return extract_purchase_order_history_request

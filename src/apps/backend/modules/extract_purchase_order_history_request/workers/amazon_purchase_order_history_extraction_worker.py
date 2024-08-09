@@ -1,8 +1,5 @@
-import os
 import sys
 
-# Add the parent directory to the system path to access modules
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 from modules.config.config_manager import ConfigManager
 from modules.logger.logger import Logger
 from modules.logger.logger_manager import LoggerManager
