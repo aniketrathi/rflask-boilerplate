@@ -36,4 +36,9 @@ run-engine-winx86:
 run-script:
 	cd src/apps/backend && \
 	pipenv install --dev && \
-	pipenv run python scripts/$(file).py
+	PYTHONPATH=./ pipenv run python scripts/$(file).py
+
+run-amazon-purchase-order-history-extraction:
+	cd src/apps/backend && \
+	pipenv install --dev && \
+	PYTHONPATH=./ pipenv run python modules/extract_purchase_order_history_request/workers/amazon_purchase_order_history_extraction_worker.py $(username) $(password) $(request_id)

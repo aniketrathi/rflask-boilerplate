@@ -82,3 +82,6 @@ terraform/*.tfvars
 
 # environment file
 .env
+
+# virtual env files
+venv/
