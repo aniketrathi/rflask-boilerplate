@@ -16,4 +16,10 @@ class ExtractPurchaseOrderHistoryRequestRouter:
             methods=["POST"],
         )
 
+        blueprint.add_url_rule(
+            "/<extract_purchase_order_history_request_id>",
+            view_func=extract_purchase_order_history_request_view.get_extract_purchase_order_history_request,
+            methods=["GET"],
+        )
+
         return blueprint

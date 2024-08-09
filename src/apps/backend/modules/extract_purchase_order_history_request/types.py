@@ -27,3 +27,8 @@ class ExtractPurchaseOrderHistoryParams:
     vendor_account_id: str
     vendor_account_password: str
     vendor_account_username: str
+
+
+@dataclass(frozen=True)
+class ExtractPurchaseOrderHistoryRequestErrorCode:
+    EXTRACT_PURCHASE_ORDER_HISTORY_REQUEST_NOT_FOUND: str = "EXTRACT_PURCHASE_ORDER_HISTORY_REQUEST_ERR_01"

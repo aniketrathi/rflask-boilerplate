@@ -27,3 +27,12 @@ class ExtractPurchaseOrderHistoryRequestView(MethodView):
         )
         extract_purchase_order_history_request_dict = asdict(extract_purchase_order_history_request)
         return jsonify(extract_purchase_order_history_request_dict), 201
+
+    def get_extract_purchase_order_history_request(
+        self, account_id: str, vendor_account_id: str, extract_purchase_order_history_request_id: str
+    ) -> ResponseReturnValue:
+        extract_purchase_order_history_request = PurchaseOrderHistorySerivce.get_extract_purchase_order_history_request(
+            request_id=extract_purchase_order_history_request_id
+        )
+        extract_purchase_order_history_request_dict = asdict(extract_purchase_order_history_request)
+        return jsonify(extract_purchase_order_history_request_dict), 200
