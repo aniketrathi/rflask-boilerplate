@@ -1,5 +1,8 @@
 import subprocess
 
+from modules.extract_purchase_order_history_request.internals.extract_purchase_order_history_request_reader import (
+    ExtractPurchaseOrderHistoryRequestReader,
+)
 from modules.extract_purchase_order_history_request.internals.extract_purchase_order_history_request_writer import (
     ExtractPurchaseOrderHistoryRequestWriter,
 )
@@ -23,3 +26,9 @@ class PurchaseOrderHistorySerivce:
         subprocess.Popen(command, shell=True)
 
         return extract_purchase_order_history_request
+
+    @staticmethod
+    def get_extract_purchase_order_history_request(request_id: str) -> ExtractPurchaseOrderHistoryRequest:
+        return ExtractPurchaseOrderHistoryRequestReader.get_extract_purchase_order_history_request_by_id(
+            request_id=request_id
+        )

@@ -2,11 +2,13 @@ from unittest.mock import patch
 
 from modules.account.account_service import AccountService
 from modules.account.types import CreateAccountParams
+from modules.extract_purchase_order_history_request.errors import ExtractPurchaseOrderHistoryRequestNotFoundError
 from modules.extract_purchase_order_history_request.extract_purchase_order_history_request_service import (
     PurchaseOrderHistorySerivce,
 )
 from modules.extract_purchase_order_history_request.types import (
     ExtractPurchaseOrderHistoryParams,
+    ExtractPurchaseOrderHistoryRequestErrorCode,
     ExtractPurchaseOrderHistoryRequestStatus,
 )
 from modules.vendor_account.types import CreateVendorAccountParams
@@ -30,7 +32,8 @@ class TestExtractPurchaseOrderHistoryRequestService(BaseTestExtractPurchaseOrder
         )
         self.vendor_account_id = vendor_account.id
 
-    def test_create_extract_purchase_order_history_request(self) -> None:
+    @patch("subprocess.Popen")
+    def test_create_extract_purchase_order_history_request(self, mock_popen) -> None:
         extract_purchase_order_history_request = PurchaseOrderHistorySerivce.extract_purchase_order_history(
             params=ExtractPurchaseOrderHistoryParams(
                 vendor_account_id=self.vendor_account_id,
@@ -55,3 +58,34 @@ class TestExtractPurchaseOrderHistoryRequestService(BaseTestExtractPurchaseOrder
 
         expected_command = f"npm run run:amazon-purchase-order-history-extraction --username={extract_purchase_order_history_params.vendor_account_username} --password={extract_purchase_order_history_params.vendor_account_password} --request_id={extract_purchase_order_history_request.id}"
         mock_popen.assert_called_once_with(expected_command, shell=True)
+
+    @patch("subprocess.Popen")
+    def test_get_extract_purchase_order_history_request(self, mock_popen) -> None:
+        # Pre test setup start
+        extract_purchase_order_history_request_saved = PurchaseOrderHistorySerivce.extract_purchase_order_history(
+            params=ExtractPurchaseOrderHistoryParams(
+                vendor_account_id=self.vendor_account_id,
+                vendor_account_password="#amz-01",
+                vendor_account_username="test@test.com",
+            )
+        )
+        # Pre test setup end
+
+        extract_purchase_order_history_request = PurchaseOrderHistorySerivce.get_extract_purchase_order_history_request(
+            request_id=extract_purchase_order_history_request_saved.id
+        )
+
+        assert extract_purchase_order_history_request.id == extract_purchase_order_history_request_saved.id
+        assert extract_purchase_order_history_request.status == ExtractPurchaseOrderHistoryRequestStatus.QUEUED.value
+        assert extract_purchase_order_history_request.vendor_account_id == self.vendor_account_id
+
+    def test_throw_exception_while_getting_extract_purchase_order_history_request_with_an_invalid_id(self) -> None:
+
+        try:
+            PurchaseOrderHistorySerivce.get_extract_purchase_order_history_request(
+                request_id="66b5aea2aac6d89a8a222ff1"
+            )
+        except ExtractPurchaseOrderHistoryRequestNotFoundError as exc:
+            assert (
+                exc.code == ExtractPurchaseOrderHistoryRequestErrorCode.EXTRACT_PURCHASE_ORDER_HISTORY_REQUEST_NOT_FOUND
+            )

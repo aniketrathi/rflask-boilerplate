@@ -5,7 +5,14 @@ from modules.access_token.access_token_service import AccessTokenService
 from modules.access_token.types import CreateAccessTokenParams
 from modules.account.account_service import AccountService
 from modules.account.types import CreateAccountParams
-from modules.extract_purchase_order_history_request.types import ExtractPurchaseOrderHistoryRequestStatus
+from modules.extract_purchase_order_history_request.extract_purchase_order_history_request_service import (
+    PurchaseOrderHistorySerivce,
+)
+from modules.extract_purchase_order_history_request.types import (
+    ExtractPurchaseOrderHistoryParams,
+    ExtractPurchaseOrderHistoryRequestErrorCode,
+    ExtractPurchaseOrderHistoryRequestStatus,
+)
 from modules.vendor_account.types import CreateVendorAccountParams
 from modules.vendor_account.vendor_account_service import VendorAccountService
 from server import app
@@ -33,7 +40,8 @@ class TestExtractPurchaseOrderHistoryRequestApi(BaseTestExtractPurchaseOrderHist
         )
         self.vendor_account_id = vendor_account.id
 
-    def test_create_vendor_account(self) -> None:
+    @patch("subprocess.Popen")
+    def test_create_vendor_account(self, mock_popen) -> None:
         payload = json.dumps({"password": "amz-01#test", "username": "test@test.com"})
 
         with app.test_client() as client:
@@ -60,3 +68,45 @@ class TestExtractPurchaseOrderHistoryRequestApi(BaseTestExtractPurchaseOrderHist
 
         expected_command = f"npm run run:amazon-purchase-order-history-extraction --username=test@test.com --password=amz-01#test --request_id={response.json["id"]}"
         mock_popen.assert_called_once_with(expected_command, shell=True)
+
+    @patch("subprocess.Popen")
+    def test_get_extract_purchase_order_history_request(self, mock_popen) -> None:
+        # Pre test setup start
+        extract_purchase_order_history_request = PurchaseOrderHistorySerivce.extract_purchase_order_history(
+            params=ExtractPurchaseOrderHistoryParams(
+                vendor_account_id=self.vendor_account_id,
+                vendor_account_password="#amz-01",
+                vendor_account_username="test@test.com",
+            )
+        )
+        # Pre test setup end
+
+        with app.test_client() as client:
+            response = client.get(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts/{self.vendor_account_id}/extract-purchase-order-history-requests/{extract_purchase_order_history_request.id}",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+            )
+
+        assert response.status_code == 200
+        assert response.json, f"No response from API with status code:: {response.status}"
+        assert response.json.get("id") == extract_purchase_order_history_request.id
+        assert response.json.get("status") == ExtractPurchaseOrderHistoryRequestStatus.QUEUED.value
+        assert response.json.get("vendor_account_id") == self.vendor_account_id
+
+    def test_get_extract_purchase_order_history_request_with_an_invalid_id(self) -> None:
+        with app.test_client() as client:
+            response = client.get(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts/{self.vendor_account_id}/extract-purchase-order-history-requests/66b5aea2aac6d89a8a222ff1",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+            )
+
+        assert response.status_code == 404
+        assert response.json
+        assert (
+            response.json.get("code")
+            == ExtractPurchaseOrderHistoryRequestErrorCode.EXTRACT_PURCHASE_ORDER_HISTORY_REQUEST_NOT_FOUND
+        )
+        assert (
+            response.json.get("message")
+            == "Extract purchase order history request with id 66b5aea2aac6d89a8a222ff1 not found. Please verify the id and try again."
+        )
