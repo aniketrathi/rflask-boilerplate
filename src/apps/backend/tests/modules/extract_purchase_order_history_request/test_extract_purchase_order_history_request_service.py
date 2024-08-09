@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from modules.account.account_service import AccountService
 from modules.account.types import CreateAccountParams
 from modules.extract_purchase_order_history_request.extract_purchase_order_history_request_service import (
@@ -39,3 +41,17 @@ class TestExtractPurchaseOrderHistoryRequestService(BaseTestExtractPurchaseOrder
 
         assert extract_purchase_order_history_request.status == ExtractPurchaseOrderHistoryRequestStatus.QUEUED.value
         assert extract_purchase_order_history_request.vendor_account_id == self.vendor_account_id
+
+    @patch("subprocess.Popen")
+    def test_amazon_purchase_order_history_extraction_worker_is_queued(self, mock_popen) -> None:
+        extract_purchase_order_history_params = ExtractPurchaseOrderHistoryParams(
+            vendor_account_id=self.vendor_account_id,
+            vendor_account_password="#amz-01",
+            vendor_account_username="test@test.com",
+        )
+        extract_purchase_order_history_request = PurchaseOrderHistorySerivce.extract_purchase_order_history(
+            params=extract_purchase_order_history_params
+        )
+
+        expected_command = f"npm run run:amazon-purchase-order-history-extraction {extract_purchase_order_history_params.vendor_account_username} {extract_purchase_order_history_params.vendor_account_password} {extract_purchase_order_history_request.id}"
+        mock_popen.assert_called_once_with(expected_command, shell=True)

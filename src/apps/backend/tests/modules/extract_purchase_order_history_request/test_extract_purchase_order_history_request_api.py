@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from modules.access_token.access_token_service import AccessTokenService
 from modules.access_token.types import CreateAccessTokenParams
@@ -45,3 +46,19 @@ class TestExtractPurchaseOrderHistoryRequestApi(BaseTestExtractPurchaseOrderHist
             assert response.json, f"No response from API with status code:: {response.status}"
             assert response.json.get("status") == ExtractPurchaseOrderHistoryRequestStatus.QUEUED.value
             assert response.json.get("vendor_account_id") == self.vendor_account_id
+
+    @patch("subprocess.Popen")
+    def test_amazon_purchase_order_history_extraction_worker_is_queued(self, mock_popen) -> None:
+        payload = json.dumps({"password": "amz-01#test", "username": "test@test.com"})
+
+        with app.test_client() as client:
+            response = client.post(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts/{self.vendor_account_id}/extract-purchase-order-history-requests",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+                data=payload,
+            )
+
+        expected_command = (
+            f"npm run run:amazon-purchase-order-history-extraction test@test.com amz-01#test {response.json["id"]}"
+        )
+        mock_popen.assert_called_once_with(expected_command, shell=True)
