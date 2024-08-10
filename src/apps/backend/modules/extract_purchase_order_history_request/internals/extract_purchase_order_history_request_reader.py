@@ -12,9 +12,11 @@ from modules.extract_purchase_order_history_request.types import ExtractPurchase
 
 class ExtractPurchaseOrderHistoryRequestReader:
     @staticmethod
-    def get_extract_purchase_order_history_request_by_id(request_id: str) -> ExtractPurchaseOrderHistoryRequest:
+    def get_extract_purchase_order_history_request_by_id(
+        request_id: str, vendor_account_id: str
+    ) -> ExtractPurchaseOrderHistoryRequest:
         extract_purchase_order_history_request_db = ExtractPurchaseOrderHistoryRequestRepository.collection().find_one(
-            {"_id": ObjectId(request_id)}
+            {"vendor_account_id": ObjectId(vendor_account_id), "_id": ObjectId(request_id)}
         )
 
         if extract_purchase_order_history_request_db is None:

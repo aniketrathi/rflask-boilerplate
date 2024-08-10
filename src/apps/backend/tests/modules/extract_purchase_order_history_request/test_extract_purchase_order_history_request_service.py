@@ -10,8 +10,10 @@ from modules.extract_purchase_order_history_request.types import (
     ExtractPurchaseOrderHistoryParams,
     ExtractPurchaseOrderHistoryRequestErrorCode,
     ExtractPurchaseOrderHistoryRequestStatus,
+    GetExtractPurchaseOrderHistoryRequesParams,
 )
-from modules.vendor_account.types import CreateVendorAccountParams
+from modules.vendor_account.errors import VendorAccountNotFoundError
+from modules.vendor_account.types import CreateVendorAccountParams, DeleteVendorAccountParams, VendorAccountErrorCode
 from modules.vendor_account.vendor_account_service import VendorAccountService
 from tests.modules.extract_purchase_order_history_request.base_test_extract_purchase_order_history_request import (
     BaseTestExtractPurchaseOrderHistoryRequest,
@@ -72,7 +74,11 @@ class TestExtractPurchaseOrderHistoryRequestService(BaseTestExtractPurchaseOrder
         # Pre test setup end
 
         extract_purchase_order_history_request = PurchaseOrderHistorySerivce.get_extract_purchase_order_history_request(
-            request_id=extract_purchase_order_history_request_saved.id
+            params=GetExtractPurchaseOrderHistoryRequesParams(
+                account_id=self.account_id,
+                extract_purchase_order_history_request_id=extract_purchase_order_history_request_saved.id,
+                vendor_account_id=self.vendor_account_id,
+            )
         )
 
         assert extract_purchase_order_history_request.id == extract_purchase_order_history_request_saved.id
@@ -80,10 +86,76 @@ class TestExtractPurchaseOrderHistoryRequestService(BaseTestExtractPurchaseOrder
         assert extract_purchase_order_history_request.vendor_account_id == self.vendor_account_id
 
     def test_throw_exception_while_getting_extract_purchase_order_history_request_with_an_invalid_id(self) -> None:
+        try:
+            PurchaseOrderHistorySerivce.get_extract_purchase_order_history_request(
+                params=GetExtractPurchaseOrderHistoryRequesParams(
+                    account_id=self.account_id,
+                    extract_purchase_order_history_request_id="66b5aea2aac6d89a8a222ff1",
+                    vendor_account_id=self.vendor_account_id,
+                )
+            )
+        except ExtractPurchaseOrderHistoryRequestNotFoundError as exc:
+            assert (
+                exc.code == ExtractPurchaseOrderHistoryRequestErrorCode.EXTRACT_PURCHASE_ORDER_HISTORY_REQUEST_NOT_FOUND
+            )
+
+    def test_throw_exception_while_getting_extract_purchase_order_history_request_when_vendor_account_does_not_exist(
+        self,
+    ) -> None:
+        # Pre test setup start
+        extract_purchase_order_history_request_saved = PurchaseOrderHistorySerivce.extract_purchase_order_history(
+            params=ExtractPurchaseOrderHistoryParams(
+                vendor_account_id=self.vendor_account_id,
+                vendor_account_password="#amz-01",
+                vendor_account_username="test@test.com",
+            )
+        )
+
+        VendorAccountService.delete_vendor_account(
+            params=DeleteVendorAccountParams(account_id=self.account_id, vendor_account_id=self.vendor_account_id)
+        )
+        # Pre test setup end
 
         try:
             PurchaseOrderHistorySerivce.get_extract_purchase_order_history_request(
-                request_id="66b5aea2aac6d89a8a222ff1"
+                params=GetExtractPurchaseOrderHistoryRequesParams(
+                    account_id=self.account_id,
+                    extract_purchase_order_history_request_id=extract_purchase_order_history_request_saved.id,
+                    vendor_account_id=self.vendor_account_id,
+                )
+            )
+        except VendorAccountNotFoundError as exc:
+            assert exc.code == VendorAccountErrorCode.VENDOR_ACCOUNT_NOT_FOUND
+
+    def test_throw_exception_when_user_try_to_extract_purchase_order_history_request_that_belongs_to_other_user(
+        self,
+    ) -> None:
+        # Pre test setup start
+        account = AccountService.create_account(
+            params=CreateAccountParams(
+                first_name="first_name", last_name="last_name", password="password", username="username_two"
+            )
+        )
+
+        vendor_account = VendorAccountService.create_vendor_account(
+            params=CreateVendorAccountParams(account_id=account.id, name="Amz-01", vendor_type="AMAZON")
+        )
+        extract_purchase_order_history_request_saved = PurchaseOrderHistorySerivce.extract_purchase_order_history(
+            params=ExtractPurchaseOrderHistoryParams(
+                vendor_account_id=vendor_account.id,
+                vendor_account_password="#amz-01",
+                vendor_account_username="test@test.com",
+            )
+        )
+        # Pre test setup end
+
+        try:
+            PurchaseOrderHistorySerivce.get_extract_purchase_order_history_request(
+                params=GetExtractPurchaseOrderHistoryRequesParams(
+                    account_id=self.account_id,
+                    extract_purchase_order_history_request_id=extract_purchase_order_history_request_saved.id,
+                    vendor_account_id=self.vendor_account_id,
+                )
             )
         except ExtractPurchaseOrderHistoryRequestNotFoundError as exc:
             assert (

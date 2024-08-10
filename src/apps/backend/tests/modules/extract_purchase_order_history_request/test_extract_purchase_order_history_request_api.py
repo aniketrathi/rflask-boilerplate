@@ -13,7 +13,7 @@ from modules.extract_purchase_order_history_request.types import (
     ExtractPurchaseOrderHistoryRequestErrorCode,
     ExtractPurchaseOrderHistoryRequestStatus,
 )
-from modules.vendor_account.types import CreateVendorAccountParams
+from modules.vendor_account.types import CreateVendorAccountParams, DeleteVendorAccountParams, VendorAccountErrorCode
 from modules.vendor_account.vendor_account_service import VendorAccountService
 from server import app
 from tests.modules.extract_purchase_order_history_request.base_test_extract_purchase_order_history_request import (
@@ -109,4 +109,72 @@ class TestExtractPurchaseOrderHistoryRequestApi(BaseTestExtractPurchaseOrderHist
         assert (
             response.json.get("message")
             == "Extract purchase order history request with id 66b5aea2aac6d89a8a222ff1 not found. Please verify the id and try again."
+        )
+
+    def test_get_extract_purchase_order_history_request_for_the_deleted_vendor_account(self) -> None:
+        # Pre test setup start
+        extract_purchase_order_history_request_saved = PurchaseOrderHistorySerivce.extract_purchase_order_history(
+            params=ExtractPurchaseOrderHistoryParams(
+                vendor_account_id=self.vendor_account_id,
+                vendor_account_password="#amz-01",
+                vendor_account_username="test@test.com",
+            )
+        )
+
+        VendorAccountService.delete_vendor_account(
+            params=DeleteVendorAccountParams(account_id=self.account_id, vendor_account_id=self.vendor_account_id)
+        )
+        # Pre test setup end
+
+        with app.test_client() as client:
+            response = client.get(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts/{self.vendor_account_id}/extract-purchase-order-history-requests/{extract_purchase_order_history_request_saved.id}",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+            )
+
+        assert response.status_code == 404
+        assert response.json
+        assert response.json.get("code") == VendorAccountErrorCode.VENDOR_ACCOUNT_NOT_FOUND
+        assert (
+            response.json.get("message")
+            == f"Vendor account with id {self.vendor_account_id} not found. Please verify the id and try again."
+        )
+
+    def test_throw_exception_when_user_try_to_extract_purchase_order_history_request_that_belongs_to_other_user(
+        self,
+    ) -> None:
+        # Pre test setup start
+        account = AccountService.create_account(
+            params=CreateAccountParams(
+                first_name="first_name", last_name="last_name", password="password", username="username_two"
+            )
+        )
+
+        vendor_account = VendorAccountService.create_vendor_account(
+            params=CreateVendorAccountParams(account_id=account.id, name="Amz-01", vendor_type="AMAZON")
+        )
+        extract_purchase_order_history_request_saved = PurchaseOrderHistorySerivce.extract_purchase_order_history(
+            params=ExtractPurchaseOrderHistoryParams(
+                vendor_account_id=vendor_account.id,
+                vendor_account_password="#amz-01",
+                vendor_account_username="test@test.com",
+            )
+        )
+        # Pre test setup end
+
+        with app.test_client() as client:
+            response = client.get(
+                f"http://127.0.0.1:8080/api/accounts/{self.account_id}/vendor-accounts/{self.vendor_account_id}/extract-purchase-order-history-requests/{extract_purchase_order_history_request_saved.id}",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.access_token}"},
+            )
+
+        assert response.status_code == 404
+        assert response.json
+        assert (
+            response.json.get("code")
+            == ExtractPurchaseOrderHistoryRequestErrorCode.EXTRACT_PURCHASE_ORDER_HISTORY_REQUEST_NOT_FOUND
+        )
+        assert (
+            response.json.get("message")
+            == f"Extract purchase order history request with id {extract_purchase_order_history_request_saved.id} not found. Please verify the id and try again."
         )
