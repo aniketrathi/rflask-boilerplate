@@ -26,3 +26,7 @@ class VendorAccountService:
     @staticmethod
     def get_vendor_accounts(account_id: str) -> List[VendorAccount]:
         return VendorAccountReader.get_vendor_accounts_by_account_id(account_id=account_id)
+
+    @staticmethod
+    def get_vendor_account(account_id: str, vendor_account_id: str) -> VendorAccount:
+        return VendorAccountReader.get_vendor_account_by_id(account_id=account_id, vendor_account_id=vendor_account_id)

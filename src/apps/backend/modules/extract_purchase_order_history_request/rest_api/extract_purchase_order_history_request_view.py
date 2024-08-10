@@ -8,7 +8,10 @@ from modules.access_token.rest_api.access_auth_middleware import access_auth_mid
 from modules.extract_purchase_order_history_request.extract_purchase_order_history_request_service import (
     PurchaseOrderHistorySerivce,
 )
-from modules.extract_purchase_order_history_request.types import ExtractPurchaseOrderHistoryParams
+from modules.extract_purchase_order_history_request.types import (
+    ExtractPurchaseOrderHistoryParams,
+    GetExtractPurchaseOrderHistoryRequesParams,
+)
 
 
 class ExtractPurchaseOrderHistoryRequestView(MethodView):
@@ -27,3 +30,16 @@ class ExtractPurchaseOrderHistoryRequestView(MethodView):
         )
         extract_purchase_order_history_request_dict = asdict(extract_purchase_order_history_request)
         return jsonify(extract_purchase_order_history_request_dict), 201
+
+    def get_extract_purchase_order_history_request(
+        self, account_id: str, vendor_account_id: str, extract_purchase_order_history_request_id: str
+    ) -> ResponseReturnValue:
+        extract_purchase_order_history_request = PurchaseOrderHistorySerivce.get_extract_purchase_order_history_request(
+            params=GetExtractPurchaseOrderHistoryRequesParams(
+                account_id=account_id,
+                extract_purchase_order_history_request_id=extract_purchase_order_history_request_id,
+                vendor_account_id=vendor_account_id,
+            )
+        )
+        extract_purchase_order_history_request_dict = asdict(extract_purchase_order_history_request)
+        return jsonify(extract_purchase_order_history_request_dict), 200
